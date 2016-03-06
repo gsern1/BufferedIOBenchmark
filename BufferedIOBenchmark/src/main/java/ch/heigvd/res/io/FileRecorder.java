@@ -25,8 +25,6 @@ public class FileRecorder implements IRecorder{
     public void init() {
         try {
             outputStream = new FileWriter(fileName);
-            //En-têtes des colonnes du fichier csv
-            //outputStream.write("operation, strategy, blockSize, fileSizeInBytes, durationInMs \n");
         } catch (IOException e) {
             e.printStackTrace();
         }

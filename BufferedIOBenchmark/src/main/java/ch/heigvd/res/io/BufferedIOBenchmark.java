@@ -27,8 +27,9 @@ public class BufferedIOBenchmark {
 
 	static final Logger LOG = Logger.getLogger(BufferedIOBenchmark.class.getName());
         
-        //LABO
-        static FileWriter outputStream = null;
+        //LABO RES
+        static FileRecorder recorder;
+        
 	/**
 	 * This enum is used to describe the 4 different strategies for doing the IOs
 	 */
@@ -80,15 +81,10 @@ public class BufferedIOBenchmark {
                 long time = Timer.takeTime();
 		LOG.log(Level.INFO, "  > Done in {0} ms.", time);
                 
-                //LABO
-                String s = "WRITE, " + ioStrategy.name() + ", " + blockSize + ", " + numberOfBytesToWrite + ", " + time + "\n";
-                
-                //Ecrire dans le fichier
-                try{
-                    outputStream.write(s);
-                }catch(IOException e){
-                    e.printStackTrace();
-                }
+                //LABO RES
+                MyExperimentData data = new MyExperimentData("WRITE", ioStrategy.name(), blockSize, numberOfBytesToWrite, time);
+                recorder.record(data);
+
 	}
 	
 	/**
@@ -138,7 +134,7 @@ public class BufferedIOBenchmark {
 		Timer.start();
 
 		InputStream is = null;
-                int totalBytesRead = 0;
+                long totalBytesRead = 0;
                 
 		try {
 			// Let's connect our stream to a file data sink
@@ -168,15 +164,9 @@ public class BufferedIOBenchmark {
                 long time = Timer.takeTime();
 		LOG.log(Level.INFO, "  > Done in {0} ms.", time);
                 
-                //LABO
-                String s = "READ, " + ioStrategy.name() + ", " + blockSize + ", " + totalBytesRead + ", " + time + "\n";
-                
-                //Ecrire dans le fichier
-                try{
-                    outputStream.write(s);
-                }catch(IOException e){
-                    e.printStackTrace();
-                }
+                //LABO RES
+                MyExperimentData data = new MyExperimentData("READ", ioStrategy.name(), blockSize, totalBytesRead, time);
+                recorder.record(data);
 
 	}
 
@@ -214,7 +204,7 @@ public class BufferedIOBenchmark {
 	 * @param args the command line arguments
 	 */
 	public static void main(String[] args) {
-            //LABO
+            /*//LABO
             try{
                 outputStream = new FileWriter("stats.csv");
                 //En-têtes des colonnes du fichier csv
@@ -222,7 +212,11 @@ public class BufferedIOBenchmark {
             }catch(IOException e){
                 e.printStackTrace();
             }
-                
+            */
+            CsvSerializer serializer = new CsvSerializer();
+            recorder = new FileRecorder("data.csv", serializer);
+            recorder.init();
+            
                 
 		System.setProperty("java.util.logging.SimpleFormatter.format", "%5$s %n");
 
@@ -258,11 +252,12 @@ public class BufferedIOBenchmark {
 		bm.consumeTestData(IOStrategy.ByteByByteWithoutBufferedStream, 0);
                 
                 //LABO
-            try{
+            recorder.close();
+            /*try{
                 outputStream.close();
             }catch(IOException e){
                 e.printStackTrace();
-            }
+            }*/
         }
 
 }
